@@ -1,0 +1,19 @@
+{
+  "package": {
+    "dependencies": {
+      "@semapps/semantic-data-provider": "0.4.0-alpha.38",
+      "react": "^16.13.1",
+      "react-admin": "^4.11.0",
+      "react-dom": "^16.13.1",
+      "react-scripts": "3.4.0"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+      "extends": "react-app"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+---
+title: Date Components
+---
+
+## Installation
+
+```bash
+npm install @semapps/date-components --save
+```
+
+If you wish to use the CalendarList or DaysList components, you must also include the following CSS file:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.7.2/main.min.css" />
+```
+
+## Components
+
+### CalendarList
+
+Display a list of resources in a calendar view, using the [FullCalendar](https://fullcalendar.io) package.
+
+```jsx
+import { List } from 'react-admin';
+import { CalendarList } from '@semapps/date-components';
+
+const MyList = props => (
+  <List pagination={false} perPage={1000} {...props}>
+    <CalendarList
+      label="label"
+      startDate="startDate"
+      endDate="endDate"
+    />
+  </List>
+);
+```
+
+| Property    | Type                   | Default      | Description                                                                      |
+|-------------|------------------------|--------------|----------------------------------------------------------------------------------|
+| `label`     | `Function` or `String` | **required** | A function which takes a record and returns a label, or the property to use      |
+| `startDate` | `Function` or `String` | **required** | A function which takes a record and returns a start date, or the property to use |
+| `endDate`   | `Function` or `String` | **required** | A function which takes a record and returns an end date, or the property to use  |
+| `locale`    | `Object`               | (English)    | The [locale](https://fullcalendar.io/docs/locale) to be used by FullCalendar     |
+| `linkType`  | `String`               | "edit"       | What kind of link to use. Available options: "show" or "edit"                    |
+
+### DaysList
+
+Same as `CalendarList`, except the resources are displayed in a [list view](https://fullcalendar.io/docs/list-view).
+
+### Date/Time inputs
+
+Based on [MUI X Date and Time Pickers](https://mui.com/x/react-date-pickers/)
+
+```jsx
+import React from 'react';
+import { Edit, SimpleForm } from 'react-admin'
+import { DateInput, TimeInput, DateTimeInput } from '@semapps/date-components';
+
+export const MyEdit = (props) => (
+  <Edit {...props}>
+    <SimpleForm>
+      <DateInput source="startDate" label="Start date" />
+      <TimeInput source="startTime" label="Start time" />
+      <DateTimeInput source="endDate" label="End time" />
+    </SimpleForm>
+  </Edit>
+);
+
+```
+
+#### Props
+
+| Property       | Type       | Default     | Description                                    |
+|----------------|------------|-------------|------------------------------------------------|
+| `locale`       | `Function` | (English)   | Locale to format the date and time             |
+| `translations` | `Function` | (English)   | Locale to format picker translations           |
+
+
+##### `locale`
+
+If you want a locale other than english, you can pass the `locale` prop:
+
+```jsx
+import frLocale from "date-fns/locale/fr";
+<DateInput source="date" label="Date in French!" locale={frLocale} />
+```
+
+##### `translations`
+
+If you want to translate picker texts other than english, you can pass the `translations` prop:
+
+```jsx
+import { frFR } from "@mui/x-date-pickers/locales";
+<DateInput source="date" label="Texts in French!" translations={frFR} />
+```

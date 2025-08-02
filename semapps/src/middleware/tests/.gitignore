@@ -1,0 +1,12 @@
+/data
+/uploads
+
+.env.local
+
+*/actors/
+*/jwt/*.key
+*/jwt/*.key.pub
+
+/actors/
+/jwt/*.key
+/jwt/*.key.pub

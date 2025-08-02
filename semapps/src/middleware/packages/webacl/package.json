@@ -1,0 +1,40 @@
+{
+  "name": "@semapps/webacl",
+  "version": "1.1.4",
+  "description": "WebACL modification service for SemApps",
+  "author": "Virtual Assembly",
+  "homepage": "https://github.com/assemblee-virtuelle/semapps#readme",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/assemblee-virtuelle/semapps.git"
+  },
+  "bugs": {
+    "url": "https://github.com/assemblee-virtuelle/semapps/issues"
+  },
+  "dependencies": {
+    "@semapps/activitypub": "1.1.4",
+    "@semapps/ldp": "1.1.4",
+    "@semapps/middlewares": "1.1.4",
+    "@semapps/mime-types": "1.1.4",
+    "@semapps/ontologies": "1.1.4",
+    "@semapps/triplestore": "1.1.4",
+    "jsonld-streaming-serializer": "^1.2.0",
+    "moleculer": "^0.14.18",
+    "n3": "^1.8.0",
+    "rdf-parse": "^1.7.0",
+    "speakingurl": "^14.0.1",
+    "streamify-string": "^1.0.1",
+    "url-join": "^4.0.1"
+  },
+  "gitHead": "684ba335d0759920f4134f550431b3c3af8e2599",
+  "engines": {
+    "node": ">=14"
+  },
+  "devDependencies": {
+    "@types/url-join": "^4.0.1"
+  }
+}

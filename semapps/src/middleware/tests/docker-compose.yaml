@@ -1,0 +1,42 @@
+services:
+  fuseki_tests:
+    image: semapps/jena-fuseki-webacl
+    container_name: fuseki_tests
+    restart: always
+    volumes:
+      - ./data/fuseki_tests:/fuseki:z
+    ports:
+      - '3040:3030'
+    expose:
+      - '3040'
+    environment:
+      ADMIN_PASSWORD: 'admin'
+
+  redis:
+    image: redis
+    container_name: redis_middleware_tests
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./data/redis:/data:z
+    command: ['redis-server', '--appendonly', 'yes']
+
+  arena:
+    image: activitypods/arena
+    container_name: arena_tests
+    restart: always
+    volumes:
+      - ./arena.json:/opt/arena/src/server/config/index.json:z
+    depends_on:
+      - redis
+    ports:
+      - '4567:4567'
+    expose:
+      - '4567'
+    environment:
+      REDIS_HOST: 'redis'
+networks:
+  default:
+    name: middleware_tests_network

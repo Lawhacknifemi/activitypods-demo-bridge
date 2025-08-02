@@ -1,0 +1,33 @@
+{
+  "name": "@semapps/auth",
+  "version": "1.1.4",
+  "description": "Authentification module for SemApps",
+  "license": "Apache-2.0",
+  "author": "Virtual Assembly",
+  "dependencies": {
+    "@semapps/ldp": "1.1.4",
+    "@semapps/middlewares": "1.1.4",
+    "@semapps/mime-types": "1.1.4",
+    "@semapps/triplestore": "1.1.4",
+    "bcrypt": "^5.0.1",
+    "express-session": "^1.17.0",
+    "jsonwebtoken": "^9.0.2",
+    "moleculer": "^0.14.17",
+    "moleculer-db": "^0.8.16",
+    "moleculer-mail": "^1.2.5",
+    "moleculer-web": "^0.10.0-beta1",
+    "openid-client": "^4.7.4",
+    "passport": "^0.4.1",
+    "passport-cas2": "0.0.12",
+    "passport-local": "^1.0.0",
+    "pug": "^3.0.2",
+    "speakingurl": "^14.0.1",
+    "url-join": "^4.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

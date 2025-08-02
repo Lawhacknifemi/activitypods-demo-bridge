@@ -1,0 +1,45 @@
+{
+  "name": "@semapps/semantic-data-provider",
+  "version": "1.1.4",
+  "description": "React-Admin data provider for LDP servers",
+  "license": "Apache-2.0",
+  "author": "Virtual Assembly",
+  "source": "src/index.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "parcel build --no-cache && yalc publish --push --changed",
+    "watch": "nodemon --ext ts,tsx,js --watch src --exec 'yarn build'"
+  },
+  "dependencies": {
+    "@rdfjs/data-model": "^1.3.4",
+    "change-case": "^5.4.4",
+    "crypto-js": "^4.1.1",
+    "http-link-header": "1.1.3",
+    "jsonld": "^5.2.0",
+    "jwt-decode": "^3.0.0",
+    "sparqljs": "^3.5.1",
+    "speakingurl": "^14.0.1",
+    "url-join": "^4.0.1"
+  },
+  "devDependencies": {
+    "@rdfjs/types": "^1.1.0",
+    "@types/http-link-header": "^1.0.7",
+    "@types/jsonld": "^1.5.14",
+    "@types/sparqljs": "^3.1.11",
+    "@types/url-join": "^4.0.1"
+  },
+  "peerDependencies": {
+    "@mui/styles": "^5.13.1",
+    "react": "^18.2.0",
+    "react-admin": "^4.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "4fa70690c5932b8c9d9cb5eb4c36a10f687703ff",
+  "types": "dist/index.d.ts"
+}

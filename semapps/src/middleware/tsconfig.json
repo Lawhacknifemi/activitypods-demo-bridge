@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "noEmit": true,
+    "noLib": false,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolvePackageJsonExports": true,
+    "esModuleInterop": true,
+    "resolvePackageJsonImports": true
+  },
+  "include": ["**/*.js", "**/*.ts"],
+  "exclude": []
+}

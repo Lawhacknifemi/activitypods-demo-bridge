@@ -1,0 +1,52 @@
+---
+title: Getting Started
+description: A basic intro to Astro.
+i18nReady: true
+tableOfContents: false
+editUrl: false
+next: false
+hero:
+  title: ActivityPods Docs
+  tagline: Guides and resources to help you build with the ActivityPods framework
+  actions:
+    - text: Get started
+      icon: rocket
+      link: /app-framework/backend/introduction
+      variant: primary
+    - text: Learn about ActivityPods' architecture
+      icon: right-arrow
+      link: /architecture/application-interoperability/
+---
+
+import { CardGrid } from '@astrojs/starlight/components';
+import Card from '../../components/Card.astro';
+import ListCard from '../../components/ListCard.astro';
+
+<CardGrid>
+  <Card title="Create your first social app" icon="star">
+    We provide [an example app](/guides/create-your-first-social-app/) that you can run in 30 minutes and connect to any existing Pod provider.
+  </Card>
+  <Card title="Deploy your own Pod provider" icon="laptop">
+    Thanks to Docker, deploying your own Pod provider is easy ! [Follow our tutorial](/guides/deploy-your-own-pod-provider/) to started.
+  </Card>
+
+  <ListCard title="App framework" icon="puzzle">
+    - [Application registration](/app-framework/backend/application-registration/)
+    - [Reading and writing resources](/app-framework/backend/reading-and-writing-resources/)
+    - [Listening to inbox & outbox](/app-framework/backend/listening-to-inbox-and-outbox/)
+    - [Posting as the user](/app-framework/backend/posting-as-the-user/)
+    - [Handling permissions](/app-framework/backend/handling-permissions/) 
+    - [Handling collections](/app-framework/backend/handling-collections/) 
+    - [Sending notifications](/app-framework/backend/sending-notifications/) 
+  </ListCard>
+  <ListCard title="Pods architecture" icon="puzzle">
+    - [Application interoperability](/architecture/application-interoperability/)
+    - [Identity](/architecture/identity/)
+    - [Authentication](/architecture/authentication/)
+    - [Authorization](/architecture/authorization/) 
+    - [Resources management](/architecture/resources-management/) 
+    - [Live update](/architecture/live-update/) 
+  </ListCard>
+</CardGrid>
+
+{/* <Discord title="Have a question or want to get involved?" cta="Join our Discord" /> */}

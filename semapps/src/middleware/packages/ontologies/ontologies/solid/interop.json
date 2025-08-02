@@ -1,0 +1,124 @@
+{
+  "prefix": "interop",
+  "namespace": "http://www.w3.org/ns/solid/interop#",
+  "jsonldContext": {
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "interop:accessNecessity": {
+      "@type": "@id"
+    },
+    "interop:accessMode": {
+      "@type": "@id"
+    },
+    "interop:accessScenario": {
+      "@type": "@id"
+    },
+    "interop:preferredScope": {
+      "@type": "@id"
+    },
+    "interop:applicationAuthor": {
+      "@type": "@id"
+    },
+    "interop:authenticatedAs": {
+      "@type": "@id"
+    },
+    "interop:dataOwner": {
+      "@type": "@id"
+    },
+    "interop:grantedAt": {
+      "@type": "xsd:dateTime"
+    },
+    "interop:grantedBy": {
+      "@type": "@id"
+    },
+    "interop:grantedWith": {
+      "@type": "@id"
+    },
+    "interop:grantee": {
+      "@type": "@id"
+    },
+    "interop:granteeType": {
+      "@type": "@id"
+    },
+    "interop:hasAccessAuthorization": {
+      "@type": "@id"
+    },
+    "interop:hasAccessGrant": {
+      "@type": "@id"
+    },
+    "interop:hasAccessNeed": {
+      "@type": "@id"
+    },
+    "interop:hasAccessNeedGroup": {
+      "@type": "@id"
+    },
+    "interop:hasAccessDescriptionSet": {
+      "@type": "@id"
+    },
+    "interop:hasDataAuthorization": {
+      "@type": "@id"
+    },
+    "interop:hasDataGrant": {
+      "@type": "@id"
+    },
+    "interop:satisfiesAccessNeed": {
+      "@type": "@id"
+    },
+    "interop:scopeOfAuthorization": {
+      "@type": "@id"
+    },
+    "interop:scopeOfGrant": {
+      "@type": "@id"
+    },
+    "interop:registeredAgent": {
+      "@type": "@id"
+    },
+    "interop:registeredAt": {
+      "@type": "xsd:dateTime"
+    },
+    "interop:registeredBy": {
+      "@type": "@id"
+    },
+    "interop:registeredWith": {
+      "@type": "@id"
+    },
+    "interop:updatedAt": {
+      "@type": "xsd:dateTime"
+    },
+    "interop:registeredShapeTree": {
+      "@type": "@id"
+    },
+    "interop:usesLanguage": {
+      "@type": "xsd:language"
+    },
+    "interop:hasAuthorizationAgent": {
+      "@type": "@id"
+    },
+    "interop:hasRegistrySet": {
+      "@type": "@id"
+    },
+    "interop:hasAgentRegistry": {
+      "@type": "@id"
+    },
+    "interop:hasAuthorizationRegistry": {
+      "@type": "@id"
+    },
+    "interop:hasDataRegistry": {
+      "@type": "@id"
+    },
+    "interop:hasDataRegistration": {
+      "@type": "@id"
+    },
+    "interop:hasDataInstance": {
+      "@type": "@id"
+    },
+    "interop:delegationOfGrant": {
+      "@type": "@id"
+    },
+    "interop:reciprocalRegistration": {
+      "@type": "@id"
+    },
+    "interop:replaces": {
+      "@type": "@id"
+    }
+  }
+}

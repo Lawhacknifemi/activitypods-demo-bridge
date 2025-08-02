@@ -1,0 +1,12 @@
+.idea
+*.iml
+
+node_modules
+yarn-error.log
+
+/app-framework/react/dist
+
+.parcel-cache
+
+.yalc
+yalc.lock

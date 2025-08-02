@@ -1,0 +1,25 @@
+{
+  "name": "@semapps/atproto",
+  "version": "1.0.0",
+  "description": "atproto module for SemApps",
+  "license": "Apache-2.0",
+  "author": "Virtual Assembly",
+  "dependencies": {
+    "@ipld/dag-cbor": "^3.0.0",
+    "@semapps/jsonld": "1.1.4",
+    "@semapps/triplestore": "1.1.4",
+    "async-lock": "^1.4.1",
+    "crypto": "^1.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "moleculer": "^0.14.18",
+    "moleculer-web": "^0.10.0-beta1",
+    "multiformats": "^13.3.7",
+    "ws": "^8.18.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

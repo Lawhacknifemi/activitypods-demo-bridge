@@ -1,0 +1,14 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "useDaemonProcess": false,
+        "cacheableOperations": ["build", "yalc:publish"]
+      }
+    }
+  },
+  "affected": {
+    "defaultBase": "master"
+  }
+}
