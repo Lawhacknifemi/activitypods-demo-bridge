@@ -1,4 +1,6 @@
-const { triple, namedNode } = require('@rdfjs/data-model');
+const dataModel = require('@rdfjs/data-model');
+const triple = dataModel.triple;
+const namedNode = dataModel.namedNode;
 const { MigrationService } = require('@semapps/migration');
 const { arrayOf } = require('@semapps/ldp');
 const { MIME_TYPES } = require('@semapps/mime-types');

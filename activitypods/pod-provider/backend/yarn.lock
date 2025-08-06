@@ -29,9 +29,9 @@
     to-fast-properties "^2.0.0"
 
 "@bergos/jsonparse@^1.4.0":
-  version "1.4.1"
-  resolved "https://registry.npmjs.org/@bergos/jsonparse/-/jsonparse-1.4.1.tgz"
-  integrity sha512-vXIT0nzZGX/+yMD5bx2VhTzc92H55tPoehh1BW/FZHOndWGFddrH3MAfdx39FRc7irABirW6EQaGxIJYV6CGuA==
+  version "1.4.2"
+  resolved "https://registry.npmjs.org/@bergos/jsonparse/-/jsonparse-1.4.2.tgz"
+  integrity sha512-qUt0QNJjvg4s1zk+AuLM6s/zcsQ8MvGn7+1f0vPuxvpCYa08YtTryuDInngbEyW5fNGGYe2znKt61RMGd5HnXg==
   dependencies:
     buffer "^6.0.3"
 
@@ -379,15 +379,20 @@
   dependencies:
     "@rdfjs/types" ">=1.0.1"
 
-"@rdfjs/data-model@^2.0.1", "@rdfjs/data-model@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/@rdfjs/data-model/-/data-model-2.0.2.tgz"
-  integrity sha512-v5LRNkLRJazMCGU7VtEzhz5wKwz/IrOdJEKapCtd35HuFbQfeGpoJP6QOXGyFHhWwKmtG+UMlZzYFyNDVE1m6g==
+"@rdfjs/data-model@^2.0.1":
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/@rdfjs/data-model/-/data-model-2.1.1.tgz"
+  integrity sha512-6mcOI4DjIPS6MOZw23H8oAdujHCk5gippVNQ7mKwliYTvTNh+uqRM91B9OLqhoAoNcQ3t49Dx2ooIMRG9/6ooA==
 
-"@rdfjs/formats@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/@rdfjs/formats/-/formats-4.0.0.tgz"
-  integrity sha512-9e0DX+iWi8d958Px6Ggb1otl/EhfyvlfWcop+lS0aZlsGV2YK9Phl5lzCUYTfTefSyyQk8tJd5XN52hhDLb5Wg==
+"@rdfjs/data-model@^2.0.2":
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/@rdfjs/data-model/-/data-model-2.1.1.tgz"
+  integrity sha512-6mcOI4DjIPS6MOZw23H8oAdujHCk5gippVNQ7mKwliYTvTNh+uqRM91B9OLqhoAoNcQ3t49Dx2ooIMRG9/6ooA==
+
+"@rdfjs/formats@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/@rdfjs/formats/-/formats-4.0.1.tgz"
+  integrity sha512-Rg53vP+x1bnGAqJNKgEzJEUPDhj+tCpzb6wdmfLoVFq4XoZ589+cg2ScFDUMMyAVsgKXvSWjDhQ9f9ab254ZxA==
   dependencies:
     "@rdfjs/parser-jsonld" "^2.1.0"
     "@rdfjs/parser-n3" "^2.0.1"
@@ -396,7 +401,7 @@
     "@rdfjs/serializer-ntriples" "^2.0.0"
     "@rdfjs/serializer-turtle" "^1.1.1"
     "@rdfjs/sink-map" "^2.0.0"
-    rdfxml-streaming-parser "^2.3.0"
+    rdfxml-streaming-parser "^3.0.1"
 
 "@rdfjs/namespace@^2.0.0":
   version "2.0.1"
@@ -406,20 +411,20 @@
     "@rdfjs/data-model" "^2.0.1"
 
 "@rdfjs/parser-jsonld@^2.1.0":
-  version "2.1.1"
-  resolved "https://registry.npmjs.org/@rdfjs/parser-jsonld/-/parser-jsonld-2.1.1.tgz"
-  integrity sha512-bddq04r/p7booWk+5IqcTlWpDljy8Sv1cdFynpzawNruZTD99n3eSj7LCHPBUzqnpXc1Dnt8tgXiqB02WSYtiw==
+  version "2.1.3"
+  resolved "https://registry.npmjs.org/@rdfjs/parser-jsonld/-/parser-jsonld-2.1.3.tgz"
+  integrity sha512-VYnPEwVdqFAPTo9F8XIN4UpGPdNzhBaCFv5b5OT74pA7H8so4aTno3Yd6M5I9bhTrUoCQjpjgr+ugYlvWxdBIA==
   dependencies:
     "@rdfjs/data-model" "^2.0.2"
     "@rdfjs/sink" "^2.0.1"
     duplex-to "^2.0.0"
-    jsonld-streaming-parser "^3.3.0"
+    jsonld-streaming-parser "^5.0.0"
     readable-stream "^4.5.2"
 
 "@rdfjs/parser-n3@^2.0.1":
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/@rdfjs/parser-n3/-/parser-n3-2.0.2.tgz"
-  integrity sha512-rrrvyh+kkj9ndwep2h6nYmugIfggDOC9uGpmDAHn/I/z52K7dHxi7xOkPPrezTsIbgNvFhV3zS7mzyObRxcLWA==
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/@rdfjs/parser-n3/-/parser-n3-2.1.0.tgz"
+  integrity sha512-/DiosB+0vPzgAs1WXcCB8MbA5hqq0fIh9VhMg7fBmoJ/I8Xl6Op/AOxVu9x1XZCHSNwO/VsJT/HYKEctZVRKSQ==
   dependencies:
     "@rdfjs/data-model" "^2.0.2"
     "@rdfjs/sink" "^2.0.1"
@@ -435,13 +440,13 @@
     readable-stream "^4.3.0"
 
 "@rdfjs/serializer-jsonld-ext@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/@rdfjs/serializer-jsonld-ext/-/serializer-jsonld-ext-4.0.0.tgz"
-  integrity sha512-HP5DCmhyfVuQuk58AO5vzNY+dIFVHe2oHY8NX2K+3XmrTmu/yzrFzPbDeU9Cwr71XC4RifEMoksIg+8jnhxmfQ==
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/@rdfjs/serializer-jsonld-ext/-/serializer-jsonld-ext-4.0.1.tgz"
+  integrity sha512-eGNAdhsV8wkmCadyIN+PBfsN+BIiqplAd5VMc++wf5McsVi/vPNrWcBINdrNnlegml8nLUy0rlKztCQ/4pxW8w==
   dependencies:
-    "@rdfjs/sink" "^2.0.0"
-    jsonld "^8.1.0"
-    readable-stream "^4.3.0"
+    "@rdfjs/sink" "^2.0.1"
+    jsonld "^8.3.3"
+    readable-stream "^4.7.0"
     stream-chunks "^1.0.0"
 
 "@rdfjs/serializer-jsonld@^2.0.0":
@@ -463,9 +468,9 @@
     readable-stream "^4.5.2"
 
 "@rdfjs/serializer-turtle@^1.1.1":
-  version "1.1.4"
-  resolved "https://registry.npmjs.org/@rdfjs/serializer-turtle/-/serializer-turtle-1.1.4.tgz"
-  integrity sha512-fw58pfAuIZblNzf8Gwl6mxfNkPH+/4Q1GwF0GFaSHg9yT0sQ1S+EzaqEVXl0MLPquEKTAMJFBs1fkdwUNq8Qww==
+  version "1.1.5"
+  resolved "https://registry.npmjs.org/@rdfjs/serializer-turtle/-/serializer-turtle-1.1.5.tgz"
+  integrity sha512-uvIFUOuMuk8JrJnng/tWKIQ+8XI6YLEms75YdvZ49LtIyyfbDqKz76EybgnD/zZYfMhVVkguKtheBC9h08g1PQ==
   dependencies:
     "@rdfjs/data-model" "^2.0.1"
     "@rdfjs/namespace" "^2.0.0"
@@ -522,6 +527,13 @@
   dependencies:
     "@types/node" "*"
 
+"@rdfjs/types@^2.0.0":
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/@rdfjs/types/-/types-2.0.1.tgz"
+  integrity sha512-uyAzpugX7KekAXAHq26m3JlUIZJOC0uSBhpnefGV5i15bevDyyejoB7I+9MKeUrzXD8OOUI3+4FeV1wwQr5ihA==
+  dependencies:
+    "@types/node" "*"
+
 "@rubensworks/saxes@^6.0.1":
   version "6.0.1"
   resolved "https://registry.npmjs.org/@rubensworks/saxes/-/saxes-6.0.1.tgz"
@@ -563,6 +575,22 @@
     node-fetch "^2.6.6"
     sparqljs "^3.5.2"
     url-join "^4.0.1"
+
+"@semapps/atproto@file:../../../semapps/src/middleware/packages/atproto":
+  version "1.0.0"
+  resolved "file:../../../semapps/src/middleware/packages/atproto"
+  dependencies:
+    "@ipld/dag-cbor" "^3.0.0"
+    "@semapps/jsonld" "1.1.4"
+    "@semapps/triplestore" "1.1.4"
+    async-lock "^1.4.1"
+    base64url "^3.0.1"
+    crypto "^1.0.1"
+    jsonwebtoken "^9.0.2"
+    moleculer "^0.14.18"
+    moleculer-web "^0.10.0-beta1"
+    multiformats "^13.3.7"
+    ws "^8.18.3"
 
 "@semapps/auth@1.1.2":
   version "1.1.2"
@@ -985,13 +1013,27 @@
   dependencies:
     "@rdfjs/types" "*"
 
-"@types/readable-stream@^2.3.11", "@types/readable-stream@^2.3.13":
+"@types/readable-stream@^2.3.11":
   version "2.3.15"
   resolved "https://registry.npmjs.org/@types/readable-stream/-/readable-stream-2.3.15.tgz"
   integrity sha512-oM5JSKQCcICF1wvGgmecmHldZ48OZamtMxcGGVICOJA8o8cahXC1zEVAif8iwoc5j8etxFaRFnf095+CDsuoFQ==
   dependencies:
     "@types/node" "*"
     safe-buffer "~5.1.1"
+
+"@types/readable-stream@^4.0.0":
+  version "4.0.21"
+  resolved "https://registry.npmjs.org/@types/readable-stream/-/readable-stream-4.0.21.tgz"
+  integrity sha512-19eKVv9tugr03IgfXlA9UVUVRbW6IuqRO5B92Dl4a6pT7K8uaGrNS0GkxiZD0BOk6PLuXl5FhWl//eX/pzYdTQ==
+  dependencies:
+    "@types/node" "*"
+
+"@types/readable-stream@^4.0.18":
+  version "4.0.21"
+  resolved "https://registry.npmjs.org/@types/readable-stream/-/readable-stream-4.0.21.tgz"
+  integrity sha512-19eKVv9tugr03IgfXlA9UVUVRbW6IuqRO5B92Dl4a6pT7K8uaGrNS0GkxiZD0BOk6PLuXl5FhWl//eX/pzYdTQ==
+  dependencies:
+    "@types/node" "*"
 
 "@types/readdir-glob@*":
   version "1.1.5"
@@ -3759,6 +3801,16 @@ jsonld-context-parser@^2.0.0, jsonld-context-parser@^2.1.2, jsonld-context-parse
     http-link-header "^1.0.2"
     relative-to-absolute-iri "^1.0.5"
 
+jsonld-context-parser@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/jsonld-context-parser/-/jsonld-context-parser-3.0.0.tgz"
+  integrity sha512-Kg6TVtBUdIm057ht/8WNhM9BROt+BeYaDGXbzrKaa3xA99csee+CsD8IMCTizRgzoO8PIzvzcxxCoRvpq1xNQw==
+  dependencies:
+    "@types/http-link-header" "^1.0.1"
+    "@types/node" "^18.0.0"
+    http-link-header "^1.0.2"
+    relative-to-absolute-iri "^1.0.5"
+
 jsonld-signatures@^11.3.0, jsonld-signatures@^11.3.2, jsonld-signatures@^11.5.0:
   version "11.5.0"
   resolved "https://registry.npmjs.org/jsonld-signatures/-/jsonld-signatures-11.5.0.tgz"
@@ -3807,20 +3859,19 @@ jsonld-streaming-parser@^2.4.2:
     jsonparse "^1.3.1"
     rdf-data-factory "^1.1.0"
 
-jsonld-streaming-parser@^3.3.0:
-  version "3.4.0"
-  resolved "https://registry.npmjs.org/jsonld-streaming-parser/-/jsonld-streaming-parser-3.4.0.tgz"
-  integrity sha512-897CloyQgQidfkB04dLM5XaAXVX/cN9A2hvgHJo4y4jRhIpvg3KLMBBfcrswepV2N3T8c/Rp2JeFdWfVsbVZ7g==
+jsonld-streaming-parser@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/jsonld-streaming-parser/-/jsonld-streaming-parser-5.0.0.tgz"
+  integrity sha512-Q6Bfbmig8fFpIbJgJTi4LLzco9dz0YuBM/mDvUYXzP8L/+me6P3pRy4exrhCpv49Bwv2oQFFIHM7wIwCKma2XA==
   dependencies:
     "@bergos/jsonparse" "^1.4.0"
-    "@rdfjs/types" "*"
     "@types/http-link-header" "^1.0.1"
-    "@types/readable-stream" "^2.3.13"
+    "@types/readable-stream" "^4.0.0"
     buffer "^6.0.3"
     canonicalize "^1.0.1"
     http-link-header "^1.0.2"
-    jsonld-context-parser "^2.4.0"
-    rdf-data-factory "^1.1.0"
+    jsonld-context-parser "^3.0.0"
+    rdf-data-factory "^2.0.0"
     readable-stream "^4.0.0"
 
 jsonld-streaming-serializer@^1.2.0:
@@ -3856,17 +3907,7 @@ jsonld@^3.3.2:
     semver "^6.3.0"
     xmldom "0.1.19"
 
-jsonld@^8.0.0, jsonld@^8.1.0:
-  version "8.3.2"
-  resolved "https://registry.npmjs.org/jsonld/-/jsonld-8.3.2.tgz"
-  integrity sha512-MwBbq95szLwt8eVQ1Bcfwmgju/Y5P2GdtlHE2ncyfuYjIdEhluUVyj1eudacf1mOkWIoS9GpDBTECqhmq7EOaA==
-  dependencies:
-    "@digitalbazaar/http-client" "^3.4.1"
-    canonicalize "^1.0.1"
-    lru-cache "^6.0.0"
-    rdf-canonize "^3.4.0"
-
-jsonld@^8.3.3:
+jsonld@^8.0.0, jsonld@^8.1.0, jsonld@^8.3.3:
   version "8.3.3"
   resolved "https://registry.npmjs.org/jsonld/-/jsonld-8.3.3.tgz"
   integrity sha512-9YcilrF+dLfg9NTEof/mJLMtbdX1RJ8dbWtJgE00cMOIohb1lIyJl710vFiTaiHTl6ZYODJuBd32xFvUhmv3kg==
@@ -5354,6 +5395,20 @@ rdf-data-factory@^1.1.0, rdf-data-factory@^1.1.2:
   dependencies:
     "@rdfjs/types" "*"
 
+rdf-data-factory@^2.0.0:
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/rdf-data-factory/-/rdf-data-factory-2.0.2.tgz"
+  integrity sha512-WzPoYHwQYWvIP9k+7IBLY1b4nIDitzAK4mA37WumAF/Cjvu/KOtYJH9IPZnUTWNSd5K2+pq4vrcE9WZC4sRHhg==
+  dependencies:
+    "@rdfjs/types" "^2.0.0"
+
+rdf-data-factory@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.npmjs.org/rdf-data-factory/-/rdf-data-factory-2.0.2.tgz"
+  integrity sha512-WzPoYHwQYWvIP9k+7IBLY1b4nIDitzAK4mA37WumAF/Cjvu/KOtYJH9IPZnUTWNSd5K2+pq4vrcE9WZC4sRHhg==
+  dependencies:
+    "@rdfjs/types" "^2.0.0"
+
 rdf-isomorphic@^1.3.0:
   version "1.3.1"
   resolved "https://registry.npmjs.org/rdf-isomorphic/-/rdf-isomorphic-1.3.1.tgz"
@@ -5426,16 +5481,15 @@ rdfxml-streaming-parser@^1.5.0:
     relative-to-absolute-iri "^1.0.0"
     sax "^1.2.4"
 
-rdfxml-streaming-parser@^2.3.0, rdfxml-streaming-parser@>=2:
-  version "2.4.0"
-  resolved "https://registry.npmjs.org/rdfxml-streaming-parser/-/rdfxml-streaming-parser-2.4.0.tgz"
-  integrity sha512-f+tdI1wxOiPzMbFWRtOwinwPsqac0WIN80668yFKcVdFCSTGOWTM70ucQGUSdDZZo7pce/UvZgV0C3LDj0P7tg==
+rdfxml-streaming-parser@^3.0.1, rdfxml-streaming-parser@>=2:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/rdfxml-streaming-parser/-/rdfxml-streaming-parser-3.1.0.tgz"
+  integrity sha512-4HJ5NbwhfT1mroMpzsI6nQHv2OYAUVI4cOsRTU7+6uBnHuYj1VTqLGbP92pcXcAYcX6H9UEOxvRHZUsF6OVgxw==
   dependencies:
-    "@rdfjs/types" "*"
     "@rubensworks/saxes" "^6.0.1"
-    "@types/readable-stream" "^2.3.13"
+    "@types/readable-stream" "^4.0.18"
     buffer "^6.0.3"
-    rdf-data-factory "^1.1.0"
+    rdf-data-factory "^2.0.2"
     readable-stream "^4.4.2"
     relative-to-absolute-iri "^1.0.0"
     validate-iri "^1.0.0"
@@ -5494,10 +5548,10 @@ readable-stream@^3.6.0:
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-readable-stream@^4.0.0, readable-stream@^4.3.0, readable-stream@^4.4.2, readable-stream@^4.5.2:
-  version "4.5.2"
-  resolved "https://registry.npmjs.org/readable-stream/-/readable-stream-4.5.2.tgz"
-  integrity sha512-yjavECdqeZ3GLXNgRXgeQEdz9fvDDkNKyHnbHRFtOr7/LcfgBcmct7t/ET+HaCTqfh06OzoAxrkN/IfjJBVe+g==
+readable-stream@^4.0.0, readable-stream@^4.3.0, readable-stream@^4.4.2, readable-stream@^4.5.2, readable-stream@^4.7.0:
+  version "4.7.0"
+  resolved "https://registry.npmjs.org/readable-stream/-/readable-stream-4.7.0.tgz"
+  integrity sha512-oIGGmcpTLwPga8Bn6/Z75SVaH1z5dUut2ibSyAMVhmUggWpmDn2dapB0n7f8nwaSiRtepAsfJyfXIO5DCVAODg==
   dependencies:
     abort-controller "^3.0.0"
     buffer "^6.0.3"
@@ -6820,10 +6874,10 @@ write-file-atomic@^1.1.4:
     imurmurhash "^0.1.4"
     slide "^1.1.5"
 
-ws@^8.17.0:
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/ws/-/ws-8.18.0.tgz"
-  integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==
+ws@^8.18.3:
+  version "8.18.3"
+  resolved "https://registry.npmjs.org/ws/-/ws-8.18.3.tgz"
+  integrity sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==
 
 xmlchars@^2.2.0:
   version "2.2.0"

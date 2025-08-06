@@ -1,6 +1,8 @@
 const path = require('node:path');
 const fs = require('fs');
-const { namedNode, quad } = require('@rdfjs/data-model');
+const dataModel = require('@rdfjs/data-model');
+const namedNode = dataModel.namedNode;
+const quad = dataModel.quad;
 const archiver = require('archiver');
 const urlJoin = require('url-join');
 const QueueService = require('moleculer-bull');

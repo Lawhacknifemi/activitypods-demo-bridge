@@ -1,6 +1,8 @@
 const urlJoin = require('url-join');
 const { arrayOf, getParentContainerUri } = require('@semapps/ldp');
-const { triple, namedNode } = require('@rdfjs/data-model');
+const dataModel = require('@rdfjs/data-model');
+const triple = dataModel.triple;
+const namedNode = dataModel.namedNode;
 const { MIME_TYPES } = require('@semapps/mime-types');
 
 /**

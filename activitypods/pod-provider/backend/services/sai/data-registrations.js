@@ -1,6 +1,9 @@
 const urlJoin = require('url-join');
 const { MIME_TYPES } = require('@semapps/mime-types');
 const { getDatasetFromUri, hasType, isURL } = require('@semapps/ldp');
+const dataModel = require('@rdfjs/data-model');
+const triple = dataModel.triple;
+const namedNode = dataModel.namedNode;
 
 module.exports = {
   name: 'data-registrations',

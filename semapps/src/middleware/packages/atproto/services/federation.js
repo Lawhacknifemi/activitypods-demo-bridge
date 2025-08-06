@@ -159,6 +159,22 @@ const FederationService = {
         throw new Error('Firehose disabled');
       }
       
+      // Ensure firehoseQueuesLock is initialized
+      if (!this.settings.firehoseQueuesLock) {
+        this.settings.firehoseQueuesLock = new (require('async-lock'))();
+      }
+      
+      // If called via HTTP (no websocket), handle WebSocket upgrade
+      if (!websocket) {
+        this.logger.info('HTTP firehose subscription request received - expecting WebSocket upgrade');
+        // Return a response that indicates WebSocket upgrade is expected
+        return { 
+          success: true, 
+          message: 'WebSocket upgrade required for firehose subscription',
+          requiresUpgrade: true 
+        };
+      }
+      
       // Add to firehose queues
       await this.settings.firehoseQueuesLock.acquire('firehose', () => {
         this.settings.firehoseQueues.add(websocket);

@@ -520,6 +520,16 @@ const AtprotoService = {
                         
                       } catch (error) {
                         this.logger.error('SPARQL query failed:', error);
+                        // If dataset doesn't exist, return empty records instead of error
+                        if (error.message.includes("doesn't exist")) {
+                          this.logger.info('Dataset does not exist yet, returning empty records');
+                          return {
+                            records: [],
+                            cursor: null,
+                            success: true,
+                            message: 'No records found (dataset not created yet)'
+                          };
+                        }
                         return {
                           records: [],
                           cursor: null,

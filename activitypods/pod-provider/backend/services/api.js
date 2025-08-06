@@ -37,6 +37,27 @@ module.exports = {
         }
       },
       {
+        name: 'identity',
+        path: '/identity',
+        bodyParsers: {
+          json: {
+            limit: '1mb'
+          }
+        },
+        aliases: {
+          // List all DIDs
+          'GET /list': 'atproto.identity.listDids',
+          // Create new DID
+          'POST /create': 'atproto.identity.createDid',
+          // Get specific DID (use a different pattern to avoid conflict)
+          'GET /did/:did': 'atproto.identity.getDid'
+        },
+        opts: {
+          // Parse URL parameters
+          parseParams: true
+        }
+      },
+      {
         name: 'atproto',
         path: '/atproto',
         bodyParsers: {
@@ -45,16 +66,16 @@ module.exports = {
           }
         },
         aliases: {
-          // Create record
-          'POST /:did/:collection/:rkey': 'atproto.createRecord',
+          // Create record - use more specific pattern to avoid LDP conflict
+          'POST /record/:did/:collection/:rkey': 'atproto.createRecord',
           // Get record
-          'GET /:did/:collection/:rkey': 'atproto.getRecord',
+          'GET /record/:did/:collection/:rkey': 'atproto.getRecord',
           // Update record
-          'PUT /:did/:collection/:rkey': 'atproto.updateRecord',
+          'PUT /record/:did/:collection/:rkey': 'atproto.updateRecord',
           // Delete record
-          'DELETE /:did/:collection/:rkey': 'atproto.deleteRecord',
+          'DELETE /record/:did/:collection/:rkey': 'atproto.deleteRecord',
           // List records
-          'GET /:did/:collection': 'atproto.listRecords'
+          'GET /record/:did/:collection': 'atproto.listRecords'
         },
         opts: {
           // Parse URL parameters

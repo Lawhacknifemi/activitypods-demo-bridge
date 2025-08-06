@@ -217,18 +217,33 @@ class Repo extends EventEmitter {
             LIMIT 1
         `;
         
+        this.logger.info('Querying for latest commit with query:', query);
+        
         try {
             const result = await this.storage('query', { query, dataset: this.did, webId: 'system' });
-            if (result.results && result.results.bindings.length > 0) {
-                const binding = result.results.bindings[0];
+            this.logger.info('Query result:', JSON.stringify(result, null, 2));
+            
+            // Handle both array format and results.bindings format
+            let bindings = [];
+            if (Array.isArray(result)) {
+                bindings = result;
+            } else if (result.results && result.results.bindings) {
+                bindings = result.results.bindings;
+            }
+            
+            if (bindings.length > 0) {
+                const binding = bindings[0];
+                this.logger.info('Found commit binding:', binding);
                 return {
                     seq: parseInt(binding.seq.value),
                     cid: binding.commitCid.value,
                     commit: JSON.parse(binding.commitData.value)
                 };
+            } else {
+                this.logger.warn('No commit bindings found in result');
             }
         } catch (error) {
-            this.logger.warn('No commits found, repository may be empty');
+            this.logger.error('Error querying for commits:', error);
         }
         
         return null;
@@ -469,6 +484,73 @@ class Repo extends EventEmitter {
      */
     getCommitSeq() {
         return this.commitSeq;
+    }
+
+    /**
+     * Get repository checkout as CAR file
+     * @param {CID} commit - Optional commit CID, defaults to latest
+     * @returns {Buffer} CAR file data
+     */
+    async getCheckout(commit = null) {
+        try {
+            // If no commit specified, get the latest commit
+            if (!commit) {
+                const latestCommit = await this.getLatestCommit();
+                this.logger.info('Latest commit:', latestCommit);
+                if (!latestCommit) {
+                    throw new Error("No commits found");
+                }
+                commit = latestCommit.cid; // Use 'cid' instead of 'commit_cid'
+            }
+
+            this.logger.info('Using commit for checkout:', commit);
+
+            // Get all blocks from Fuseki (like demo-pds-js gets from SQLite)
+            const query = `
+                PREFIX atproto: <https://atproto.com/ns#>
+                
+                SELECT ?cid ?data
+                WHERE {
+                    ?block a atproto:Block ;
+                           atproto:hasCid ?cid ;
+                           atproto:hasData ?data ;
+                           atproto:hasDid "${this.did}" .
+                }
+            `;
+            
+            const result = await this.storage('query', { query, dataset: this.did, webId: 'system' });
+            this.logger.info('Found blocks in Fuseki:', result.length || 0);
+            
+            // Convert blocks to the format needed for CAR serialization
+            const carBlocks = [];
+            if (Array.isArray(result)) {
+                for (const binding of result) {
+                    const cidStr = binding.cid.value;
+                    const dataBase64 = binding.data.value;
+                    
+                    // Convert CID string back to bytes (using dynamic import like other parts of the codebase)
+                    const multiformats = await import('multiformats');
+                    const cid = multiformats.CID.parse(cidStr);
+                    
+                    // Convert base64 data back to buffer
+                    const data = Buffer.from(dataBase64, 'base64');
+                    
+                    carBlocks.push([
+                        Buffer.from(cid.bytes), // Use raw bytes for CID
+                        data
+                    ]);
+                }
+            }
+
+            // Import the serialise function from carfile.js
+            const { serialise } = require('./carfile.js');
+            
+            // Serialize to CAR format
+            return serialise([commit], carBlocks);
+        } catch (err) {
+            this.logger.error('Error in getCheckout:', err);
+            throw err;
+        }
     }
 }
 

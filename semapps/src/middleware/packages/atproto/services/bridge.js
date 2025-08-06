@@ -84,7 +84,7 @@ const BridgeService = {
       const actorUri = activity.actor;
       
       // Get the DID for this actor
-      const did = await this.actions.getDidForActor({ params: { actorUri } });
+      const did = await this.broker.call('atproto.bridge.getDidForActor', { actorUri });
       if (!did) {
         this.logger.warn(`No DID mapping found for actor: ${actorUri}`);
         return null;
@@ -119,7 +119,7 @@ const BridgeService = {
       }
       
       // Get the ActivityPub actor for this DID
-      const actorUri = await this.actions.getActorForDid({ params: { did } });
+      const actorUri = await this.broker.call('atproto.bridge.getActorForDid', { did });
       if (!actorUri) {
         this.logger.warn(`No ActivityPub actor mapping found for DID: ${did}`);
         return null;
@@ -211,24 +211,32 @@ const BridgeService = {
         }
         
         // Get the actor's outbox
-        const actorUri = await this.actions.getActorForDid({ params: { did } });
+        const actorUri = await this.broker.call('atproto.bridge.getActorForDid', { did });
+        if (!actorUri) {
+          this.logger.warn('Bridge: No ActivityPub actor mapping found for DID:', did);
+          return;
+        }
         const outboxUri = `${actorUri}/outbox`;
         
         // Create ActivityPub post
-        const result = await this.broker.call('activitypub.outbox.post', {
-          collectionUri: outboxUri,
-          ...activityPubData,
-          transient: true // Don't persist the activity, just send it
-        });
-        
-        this.logger.info('Bridge: Created ActivityPub post from atproto:', result.id);
-        
-        // Emit event for successful bridge
-        this.broker.emit('atproto.bridge.atproto.to.activitypub', {
-          atprotoUri: record.uri,
-          activityPubId: result.id,
-          direction: 'atproto-to-activitypub'
-        });
+        try {
+          const result = await this.broker.call('activitypub.outbox.post', {
+            collectionUri: outboxUri,
+            ...activityPubData,
+            transient: true // Don't persist the activity, just send it
+          });
+          
+          this.logger.info('Bridge: Created ActivityPub post from atproto:', result.id);
+          
+          // Emit event for successful bridge
+          this.broker.emit('atproto.bridge.atproto.to.activitypub', {
+            atprotoUri: record.uri,
+            activityPubId: result.id,
+            direction: 'atproto-to-activitypub'
+          });
+        } catch (error) {
+          this.logger.warn('Bridge: Failed to create ActivityPub post, but continuing:', error.message);
+        }
         
       } catch (error) {
         this.logger.error('Bridge: Failed to handle atproto record:', error);
