@@ -10,9 +10,9 @@
     "directory": "pod-provider/backend"
   },
   "scripts": {
-    "dev": "moleculer-runner --repl --hot services/*.js services/**/*.js",
-    "start": "moleculer-runner services/*.js services/**/*.js",
-    "test": "NODE_ENV=test moleculer-runner --repl --hot services/*.js services/**/*.js",
+    "dev": "NODE_OPTIONS=--preserve-symlinks moleculer-runner --repl --hot services/*.js services/**/*.js",
+    "start": "NODE_OPTIONS=--preserve-symlinks moleculer-runner services/*.js services/**/*.js",
+    "test": "NODE_ENV=test NODE_OPTIONS=--preserve-symlinks moleculer-runner --repl --hot services/*.js services/**/*.js",
     "link-semapps-packages": "yarn link @semapps/activitypub @semapps/auth @semapps/backup @semapps/core @semapps/crypto @semapps/importer @semapps/inference @semapps/jsonld @semapps/ldp @semapps/middlewares @semapps/migration @semapps/mime-types @semapps/ontologies @semapps/sync @semapps/nodeinfo @semapps/notifications @semapps/solid @semapps/sparql-endpoint @semapps/triplestore @semapps/void @semapps/webacl @semapps/webfinger @semapps/webhooks @semapps/webid",
     "unlink-semapps-packages": "yarn unlink @semapps/activitypub @semapps/auth @semapps/backup @semapps/core @semapps/crypto @semapps/importer @semapps/inference @semapps/jsonld @semapps/ldp @semapps/middlewares @semapps/migration @semapps/mime-types @semapps/ontologies @semapps/sync @semapps/nodeinfo @semapps/notifications @semapps/solid @semapps/sparql-endpoint @semapps/triplestore @semapps/void @semapps/webacl @semapps/webfinger @semapps/webhooks @semapps/webid"
   },
@@ -20,6 +20,7 @@
     "@ipld/dag-cbor": "^9.0.0",
     "@rdfjs/formats": "4.0.0",
     "@semapps/activitypub": "1.1.2",
+    "@semapps/atproto": "file:/Users/sheriflawal/Dev/activitypods-demo-bridge/semapps/src/middleware/packages/atproto",
     "@semapps/auth": "1.1.2",
     "@semapps/backup": "1.1.2",
     "@semapps/crypto": "1.1.2",
@@ -41,6 +42,7 @@
     "@types/rdfjs__formats": "^4.0.1",
     "archiver": "^7.0.1",
     "axios": "^1.11.0",
+    "base64url": "^3.0.1",
     "dotenv-flow": "^3.2.0",
     "glob": "^11.0.3",
     "handlebars": "^4.7.7",
@@ -61,5 +63,9 @@
   },
   "engines": {
     "node": ">=22.12.0"
+  },
+  "resolutions": {
+    "@semapps/jsonld": "1.1.2",
+    "@semapps/triplestore": "1.1.2"
   }
 }

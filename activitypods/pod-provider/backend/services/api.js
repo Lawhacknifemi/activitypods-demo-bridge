@@ -2,8 +2,52 @@ const fs = require('fs');
 const path = require('path');
 const ApiGatewayService = require('moleculer-web');
 const { Errors: E } = require('moleculer-web');
+const { WebSocketServer } = require('ws');
 const WebSocketMixin = require('../mixins/websocket');
 const CONFIG = require('../config/config');
+
+// Attach WebSocket upgrade handler for subscribeRepos to the HTTP server
+// This fires BEFORE moleculer-web processes the request, so it cleanly hijacks the connection
+function attachFirehoseUpgradeHandler(server, broker) {
+  const wss = new WebSocketServer({ noServer: true });
+
+  server.on('upgrade', (req, socket, head) => {
+    const url = req.url?.split('?')[0];
+    if (url !== '/xrpc/com.atproto.sync.subscribeRepos') return;
+
+    wss.handleUpgrade(req, socket, head, ws => {
+      broker.logger.info('Relay/client connected to atproto firehose');
+
+      // Send #info frame on connect (atproto spec)
+      import('@ipld/dag-cbor').then(dagCbor => {
+        Promise.all([
+          dagCbor.encode({ t: '#info', op: 1 }),
+          dagCbor.encode({ name: 'OutdatedCursor' })
+        ]).then(([h, b]) => {
+          try { ws.send(Buffer.concat([h, b])); } catch (_) {}
+        });
+      });
+
+      // Register with federation service firehose queue
+      const fedService = broker.services.find(s => s.name === 'atproto.federation');
+      if (fedService) {
+        fedService.settings.firehoseQueues.add(ws);
+        ws.firehoseQueue = [];
+      }
+
+      ws.on('close', () => {
+        broker.logger.info('Relay/client disconnected from atproto firehose');
+        const fed = broker.services.find(s => s.name === 'atproto.federation');
+        if (fed) fed.settings.firehoseQueues.delete(ws);
+      });
+      ws.on('error', err => {
+        broker.logger.warn('Firehose WebSocket error:', err.message);
+        const fed = broker.services.find(s => s.name === 'atproto.federation');
+        if (fed) fed.settings.firehoseQueues.delete(ws);
+      });
+    });
+  });
+}
 
 module.exports = {
   mixins: [ApiGatewayService, WebSocketMixin],
@@ -39,59 +83,32 @@ module.exports = {
       {
         name: 'identity',
         path: '/identity',
-        bodyParsers: {
-          json: {
-            limit: '1mb'
-          }
-        },
+        bodyParsers: { json: { limit: '1mb' } },
         aliases: {
-          // List all DIDs
           'GET /list': 'atproto.identity.listDids',
-          // Create new DID
           'POST /create': 'atproto.identity.createDid',
-          // Get specific DID (use a different pattern to avoid conflict)
           'GET /did/:did': 'atproto.identity.getDid'
         },
-        opts: {
-          // Parse URL parameters
-          parseParams: true
-        }
+        opts: { parseParams: true }
       },
       {
         name: 'atproto',
         path: '/atproto',
-        bodyParsers: {
-          json: {
-            limit: '1mb'
-          }
-        },
+        bodyParsers: { json: { limit: '1mb' } },
         aliases: {
-          // Create record - use more specific pattern to avoid LDP conflict
           'POST /record/:did/:collection/:rkey': 'atproto.createRecord',
-          // Get record
           'GET /record/:did/:collection/:rkey': 'atproto.getRecord',
-          // Update record
           'PUT /record/:did/:collection/:rkey': 'atproto.updateRecord',
-          // Delete record
           'DELETE /record/:did/:collection/:rkey': 'atproto.deleteRecord',
-          // List records
           'GET /record/:did/:collection': 'atproto.listRecords'
         },
-        opts: {
-          // Parse URL parameters
-          parseParams: true
-        }
+        opts: { parseParams: true }
       },
       {
         name: 'bridge',
         path: '/bridge',
-        bodyParsers: {
-          json: {
-            limit: '1mb'
-          }
-        },
+        bodyParsers: { json: { limit: '1mb' } },
         aliases: {
-          // Bridge mapping operations
           'POST /registerMapping': 'atproto.bridge.registerMapping',
           'POST /getDidForActor': 'atproto.bridge.getDidForActor',
           'POST /getActorForDid': 'atproto.bridge.getActorForDid',
@@ -102,20 +119,18 @@ module.exports = {
       {
         name: 'federation',
         path: '/xrpc',
-        bodyParsers: {
-          json: {
-            limit: '1mb'
-          }
-        },
+        bodyParsers: { json: { limit: '1mb' } },
         aliases: {
-          // Atproto federation endpoints
+          'GET /com.atproto.server.describeServer': 'atproto.federation.describeServer',
+          'POST /com.atproto.sync.requestCrawl': 'atproto.federation.requestCrawl',
           'GET /com.atproto.sync.getRepoStatus': 'atproto.federation.getRepoStatus',
           'GET /com.atproto.sync.getRepo': 'atproto.federation.getRepoCar',
           'GET /com.atproto.sync.getCheckout': 'atproto.federation.getRepoCar',
           'POST /com.atproto.repo.createRecord': 'atproto.federation.createRecordWithFederation',
           'POST /com.atproto.sync.notifyOfUpdate': 'atproto.federation.broadcastToFirehose',
           'GET /com.atproto.sync.subscribeRepos': 'atproto.federation.subscribeToFirehose'
-        }
+        },
+        callOptions: { timeout: 0 }
       }
     ]
   },
@@ -129,6 +144,19 @@ module.exports = {
       ctx.meta.$location = CONFIG.FRONTEND_URL;
     }
   },
+  created() {
+    // Attach the WebSocket upgrade handler once the HTTP server is created
+    // We use a small poll because the server is created during moleculer-web's created() hook
+    const attachWhenReady = () => {
+      if (this.server) {
+        attachFirehoseUpgradeHandler(this.server, this.broker);
+        this.logger.info('Attached atproto firehose WebSocket upgrade handler');
+      } else {
+        setTimeout(attachWhenReady, 100);
+      }
+    };
+    setTimeout(attachWhenReady, 100);
+  },
   methods: {
     async authenticate(ctx, route, req, res) {
       if (req.headers.signature) {
@@ -138,13 +166,10 @@ module.exports = {
       if (token) {
         const payload = await ctx.call('auth.jwt.decodeToken', { token });
         if (payload?.azp) {
-          // This is a OIDC provider-generated ID token
           return ctx.call('solid-oidc.authenticate', { route, req, res });
         }
-        // Otherwise it is a custom JWT token (used by ActivityPods frontend)
         return ctx.call('auth.authenticate', { route, req, res });
       }
-
       ctx.meta.webId = 'anon';
       return null;
     },
@@ -156,10 +181,8 @@ module.exports = {
       if (token) {
         const payload = await ctx.call('auth.jwt.decodeToken', { token });
         if (payload.azp) {
-          // This is a OIDC provider-generated ID token
           return ctx.call('solid-oidc.authorize', { route, req, res });
         }
-        // Otherwise it is a custom JWT token (used by ActivityPods frontend) or a VC capability
         return ctx.call('auth.authorize', { route, req, res });
       }
       ctx.meta.webId = 'anon';
