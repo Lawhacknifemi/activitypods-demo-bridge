@@ -1,5 +1,7 @@
 # ActivityPods × AT Protocol Bridge
 
+> ⚠️ **This project is under heavy active development.** APIs, data formats, and behaviour will change without notice. Not production-ready.
+
 A unified federated platform that runs [ActivityPub](https://www.w3.org/TR/activitypub/) and [AT Protocol](https://atproto.com/) simultaneously on a single personal data pod server, with automatic cross-protocol synchronization and a relay-compatible firehose.
 
 Users own their data in a [Solid](https://solidproject.org/) pod. Their posts, contacts, and social graph are accessible to both the ActivityPub network (Mastodon, Pixelfed, etc.) and the AT Protocol network (Bluesky), without needing separate accounts.
