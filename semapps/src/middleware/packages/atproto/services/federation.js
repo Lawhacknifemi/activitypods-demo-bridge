@@ -59,11 +59,89 @@ const FederationService = {
     if (this.settings.enableAppview) {
       await this.initializeAppviewAuth();
     }
+
+    // Hook into the main HTTP server's upgrade event to handle subscribeRepos WebSocket
+    // We wait for the api service to be ready, then attach to its server
+    this.broker.waitForServices(['api']).then(() => {
+      const apiService = this.broker.services.find(s => s.name === 'api');
+      const httpServer = apiService?.server;
+
+      if (!httpServer) {
+        this.logger.warn('Could not find HTTP server on api service — subscribeRepos WebSocket unavailable');
+        return;
+      }
+
+      const wss = new WebSocket.Server({ noServer: true });
+
+      httpServer.on('upgrade', (req, socket, head) => {
+        const url = req.url?.split('?')[0];
+        if (url !== '/xrpc/com.atproto.sync.subscribeRepos') return;
+
+        wss.handleUpgrade(req, socket, head, (ws) => {
+          this.logger.info('Relay/client connected to firehose');
+          this.settings.firehoseQueues.add(ws);
+          ws.firehoseQueue = [];
+
+          // Send #info frame on connect (atproto spec)
+          const { dagCbor: dc } = require('../utils/atproto-utils');
+          Promise.all([
+            dc.encode({ t: '#info', op: 1 }),
+            dc.encode({ name: 'OutdatedCursor' })
+          ]).then(([h, b]) => {
+            try { ws.send(Buffer.concat([h, b])); } catch (_) {}
+          });
+
+          ws.on('close', () => {
+            this.logger.info('Relay/client disconnected from firehose');
+            this.settings.firehoseQueues.delete(ws);
+          });
+          ws.on('error', (err) => {
+            this.logger.warn('Firehose WebSocket error:', err.message);
+            this.settings.firehoseQueues.delete(ws);
+          });
+        });
+      });
+
+      this.logger.info('Registered subscribeRepos WebSocket upgrade handler on main HTTP server');
+    }).catch(e => {
+      this.logger.warn('Could not attach WebSocket upgrade handler:', e.message);
+    });
     
     this.logger.info('Atproto Federation service started');
   },
 
   actions: {
+    /**
+     * com.atproto.server.describeServer
+     * Required by the relay to verify this is a valid PDS
+     */
+    async describeServer(ctx) {
+      const baseUri = this.settings.baseUri || 'http://localhost:3000';
+      const hostname = new URL(baseUri).hostname;
+
+      // The PDS DID — for a local dev instance we use did:web
+      const serverDid = `did:web:${hostname}`;
+
+      return {
+        did: serverDid,
+        availableUserDomains: [hostname],
+        inviteCodeRequired: false,
+        links: {}
+      };
+    },
+
+    /**
+     * com.atproto.sync.requestCrawl
+     * Called by relays to ask us to notify them of updates
+     */
+    async requestCrawl(ctx) {
+      const { hostname } = ctx.params;
+      this.logger.info(`Relay requested crawl from: ${hostname}`);
+      // In a full implementation we'd subscribe to the relay's firehose
+      // For now just acknowledge
+      return {};
+    },
+
     /**
      * Broadcast message to all firehose subscribers
      */
@@ -84,20 +162,51 @@ const FederationService = {
     async getRepoStatus(ctx) {
       const { did } = ctx.params;
       
-      // Get the repository from our storage
-      const repo = this.broker.services.find(s => s.name === 'atproto')?.settings.repositories.get(did);
-      
-      if (!repo) {
-        throw new Error('Repository not found');
+      // Try in-memory repo first
+      const atprotoService = this.broker.services.find(s => s.name === 'atproto');
+      const repo = atprotoService?.settings?.repositories?.get(did);
+
+      if (repo) {
+        const latestCommit = await repo.getLatestCommit();
+        return {
+          did,
+          handle: did.replace('did:plc:', ''),
+          service: this.settings.baseUri,
+          status: 'active',
+          type: 'repo',
+          rev: latestCommit?.commit?.rev || null
+        };
       }
-      
-      return {
-        did,
-        handle: did.replace('did:plc:', ''), // Simple handle mapping
-        service: this.settings.baseUri,
-        status: 'active',
-        type: 'repo'
-      };
+
+      // Fall back to Fuseki — check if any blocks exist for this DID
+      try {
+        const result = await ctx.call('triplestore.query', {
+          query: `
+            PREFIX atproto: <https://atproto.com/ns#>
+            SELECT ?cid WHERE {
+              ?commit a atproto:Commit ;
+                      atproto:hasCid ?cid ;
+                      atproto:hasDid "${did}" .
+            } LIMIT 1
+          `,
+          dataset: did,
+          webId: 'system'
+        });
+        const bindings = Array.isArray(result) ? result : (result.results?.bindings || []);
+        if (bindings.length > 0) {
+          return {
+            did,
+            handle: did.replace('did:plc:', ''),
+            service: this.settings.baseUri,
+            status: 'active',
+            type: 'repo'
+          };
+        }
+      } catch (e) {
+        // dataset doesn't exist
+      }
+
+      throw new Error('Repository not found');
     },
 
     /**
@@ -106,20 +215,38 @@ const FederationService = {
     async getRepoCar(ctx) {
       const { did, commit } = ctx.params;
       
-      // Get the repository
-      const repo = this.broker.services.find(s => s.name === 'atproto')?.settings.repositories.get(did);
-      
+      // Try in-memory repo first
+      const atprotoService = this.broker.services.find(s => s.name === 'atproto');
+      let repo = atprotoService?.settings?.repositories?.get(did);
+
+      // If not in memory, reconstruct a lightweight repo shell that can query Fuseki
       if (!repo) {
-        throw new Error('Repository not found');
+        const { Repo } = require('../utils/repo');
+        const storageCall = (action, params) => ctx.call(`triplestore.${action}`, params);
+        // Check dataset exists first
+        try {
+          await ctx.call('triplestore.query', {
+            query: 'ASK { ?s ?p ?o }',
+            dataset: did,
+            webId: 'system'
+          });
+        } catch (e) {
+          throw new Error('Repository not found');
+        }
+        repo = new Repo(did, storageCall, null, null);
       }
       
       // Get CAR file data
-      const carData = await repo.getCheckout(commit ? CID.decode(commit) : null);
+      const carData = await repo.getCheckout(commit || null);
       
-      return {
-        contentType: 'application/vnd.ipld.car',
-        data: carData
+      // Set response headers for binary CAR file
+      ctx.meta.$responseType = 'application/vnd.ipld.car';
+      ctx.meta.$responseHeaders = {
+        'Content-Type': 'application/vnd.ipld.car',
+        'Content-Disposition': `attachment; filename="${did}.car"`
       };
+
+      return Buffer.isBuffer(carData) ? carData : Buffer.from(carData);
     },
 
     /**
@@ -150,40 +277,53 @@ const FederationService = {
     },
 
     /**
-     * Subscribe to firehose
+     * Subscribe to firehose — handles WebSocket upgrade via WebSocketMixin's request handler
      */
     async subscribeToFirehose(ctx) {
-      const { websocket } = ctx.params;
-      
-      if (!this.settings.enableFirehose) {
-        throw new Error('Firehose disabled');
+      const req = ctx.options?.parentCtx?.params?.req || ctx.params.req;
+
+      // The WebSocketMixin sets req.webSocketRequestHandler when it's a WS upgrade
+      if (req && req.webSocketRequestHandler) {
+        this.logger.info('Relay/client connecting to atproto firehose via WebSocket upgrade');
+
+        // Perform the WS handshake
+        const ws = await req.webSocketRequestHandler();
+
+        // Send #info frame on connect (atproto spec)
+        try {
+          const { dagCbor: dc } = require('../utils/atproto-utils');
+          const [h, b] = await Promise.all([
+            dc.encode({ t: '#info', op: 1 }),
+            dc.encode({ name: 'OutdatedCursor' })
+          ]);
+          ws.send(Buffer.concat([h, b]));
+        } catch (e) {
+          this.logger.warn('Could not send #info frame:', e.message);
+        }
+
+        // Register with firehose queue
+        this.settings.firehoseQueues.add(ws);
+        ws.firehoseQueue = [];
+
+        ws.on('close', () => {
+          this.logger.info('Relay/client disconnected from atproto firehose');
+          this.settings.firehoseQueues.delete(ws);
+        });
+        ws.on('error', err => {
+          this.logger.warn('Firehose WebSocket error:', err.message);
+          this.settings.firehoseQueues.delete(ws);
+        });
+
+        // Keep the connection open — return a never-resolving promise
+        // The WebSocketMixin's delayConnectionClosing handles this
+        return new Promise(() => {});
       }
-      
-      // Ensure firehoseQueuesLock is initialized
-      if (!this.settings.firehoseQueuesLock) {
-        this.settings.firehoseQueuesLock = new (require('async-lock'))();
-      }
-      
-      // If called via HTTP (no websocket), handle WebSocket upgrade
-      if (!websocket) {
-        this.logger.info('HTTP firehose subscription request received - expecting WebSocket upgrade');
-        // Return a response that indicates WebSocket upgrade is expected
-        return { 
-          success: true, 
-          message: 'WebSocket upgrade required for firehose subscription',
-          requiresUpgrade: true 
-        };
-      }
-      
-      // Add to firehose queues
-      await this.settings.firehoseQueuesLock.acquire('firehose', () => {
-        this.settings.firehoseQueues.add(websocket);
-        websocket.firehoseQueue = [];
-      });
-      
-      this.logger.info('Client subscribed to firehose');
-      
-      return { success: true };
+
+      // Plain HTTP request — return info
+      return {
+        message: 'This endpoint requires a WebSocket connection',
+        docs: 'https://atproto.com/specs/event-stream'
+      };
     },
 
     /**

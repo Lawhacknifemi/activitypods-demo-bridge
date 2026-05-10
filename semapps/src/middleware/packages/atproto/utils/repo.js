@@ -260,7 +260,7 @@ class Repo extends EventEmitter {
             '@context': {
                 '@vocab': 'https://atproto.com/ns#'
             },
-            '@id': `${this.did}/commits/${seq}`,
+            '@id': `https://atproto.com/commits/${encodeURIComponent(this.did)}/${seq}`,
             '@type': ['Commit'],
             'hasSeq': seq,
             'hasCid': cid,
@@ -287,7 +287,7 @@ class Repo extends EventEmitter {
             '@context': {
                 '@vocab': 'https://atproto.com/ns#'
             },
-            '@id': `${this.did}/blocks/${cid}`,
+            '@id': `https://atproto.com/blocks/${encodeURIComponent(this.did)}/${cid}`,
             '@type': ['Block'],
             'hasCid': cid,
             'hasData': Buffer.from(data).toString('base64'),
@@ -295,12 +295,12 @@ class Repo extends EventEmitter {
             'createdAt': new Date().toISOString()
         };
         
-                    await this.storage('insert', {
-                resource: blockRecord,
-                contentType: 'application/ld+json',
-                dataset: this.did,
-                webId: 'system'
-            });
+        await this.storage('insert', {
+            resource: blockRecord,
+            contentType: 'application/ld+json',
+            dataset: this.did,
+            webId: 'system'
+        });
     }
 
     /**
@@ -493,60 +493,55 @@ class Repo extends EventEmitter {
      */
     async getCheckout(commit = null) {
         try {
-            // If no commit specified, get the latest commit
+            const { serialise } = require('./carfile.js');
+            const multiformats = await import('multiformats');
+            const CID = multiformats.CID;
+
+            // Resolve commit CID
+            let commitCid;
             if (!commit) {
                 const latestCommit = await this.getLatestCommit();
-                this.logger.info('Latest commit:', latestCommit);
-                if (!latestCommit) {
-                    throw new Error("No commits found");
-                }
-                commit = latestCommit.cid; // Use 'cid' instead of 'commit_cid'
+                if (!latestCommit) throw new Error('No commits found');
+                commitCid = CID.parse(latestCommit.cid);
+            } else if (typeof commit === 'string') {
+                commitCid = CID.parse(commit);
+            } else {
+                commitCid = commit; // already a CID object
             }
 
-            this.logger.info('Using commit for checkout:', commit);
+            this.logger.info('Building CAR for commit:', commitCid.toString());
 
-            // Get all blocks from Fuseki (like demo-pds-js gets from SQLite)
+            // Fetch all blocks stored in Fuseki for this DID
             const query = `
                 PREFIX atproto: <https://atproto.com/ns#>
-                
                 SELECT ?cid ?data
                 WHERE {
                     ?block a atproto:Block ;
                            atproto:hasCid ?cid ;
-                           atproto:hasData ?data ;
-                           atproto:hasDid "${this.did}" .
+                           atproto:hasData ?data .
+                    FILTER(str(?block) != "")
                 }
             `;
-            
+
             const result = await this.storage('query', { query, dataset: this.did, webId: 'system' });
-            this.logger.info('Found blocks in Fuseki:', result.length || 0);
-            
-            // Convert blocks to the format needed for CAR serialization
+            this.logger.info('Blocks found in Fuseki:', Array.isArray(result) ? result.length : 0);
+
             const carBlocks = [];
             if (Array.isArray(result)) {
                 for (const binding of result) {
-                    const cidStr = binding.cid.value;
-                    const dataBase64 = binding.data.value;
-                    
-                    // Convert CID string back to bytes (using dynamic import like other parts of the codebase)
-                    const multiformats = await import('multiformats');
-                    const cid = multiformats.CID.parse(cidStr);
-                    
-                    // Convert base64 data back to buffer
+                    const cidStr = binding.cid?.value ?? binding.cid;
+                    const dataBase64 = binding.data?.value ?? binding.data;
+
+                    const cid = CID.parse(cidStr);
                     const data = Buffer.from(dataBase64, 'base64');
-                    
-                    carBlocks.push([
-                        Buffer.from(cid.bytes), // Use raw bytes for CID
-                        data
-                    ]);
+
+                    carBlocks.push([new Uint8Array(cid.bytes), new Uint8Array(data)]);
                 }
             }
 
-            // Import the serialise function from carfile.js
-            const { serialise } = require('./carfile.js');
-            
-            // Serialize to CAR format
-            return serialise([commit], carBlocks);
+            // Serialize to CAR v1 format
+            const carBytes = await serialise([commitCid], carBlocks);
+            return Buffer.from(carBytes);
         } catch (err) {
             this.logger.error('Error in getCheckout:', err);
             throw err;

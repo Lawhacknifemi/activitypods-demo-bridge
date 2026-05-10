@@ -6,7 +6,8 @@ const AtprotoService = {
       baseUri: null,
       podProvider: false,
       mstStorage: null,
-      repositories: new Map() // Store repositories by DID
+      repositories: new Map(), // Store repositories by DID
+      globalSeq: 0             // Global monotonic sequence counter for firehose
     },
   dependencies: ['triplestore', 'jsonld'],
   
@@ -100,17 +101,22 @@ const AtprotoService = {
         this.logger.info('Created new repository for DID:', did);
       }
       
-      // Add record to repository's MST
-      await repo.tree.add(`${collection}/${recordKey}`, {
-        uri: `at://${did}/${collection}/${recordKey}`,
-        cid: recordCid.toString(),
-        value: cleanedRecord,
-        createdAt: new Date().toISOString()
-      });
-      
+      // Add record to repository's MST (tree.add returns a new immutable MST)
+      repo.tree = await repo.tree.add(`${collection}/${recordKey}`, recordCid.toString());
+
+      // Store the MST root node block BEFORE createCommit so the commit references the correct root
+      const mstRootCid = await repo.tree.getPointer();
+      const mstEntries = await repo.tree.getEntries();
+      const mstNodeData = await repo.tree.serializeNodeData(mstEntries);
+      const mstNodeBytes = await dagCbor.encode(mstNodeData);
+      await repo.storeBlock(mstRootCid.toString(), mstNodeBytes);
+
       // Create commit for this record
       const commitResult = await repo.createCommit(collection, recordKey, recordCid.toString());
       this.logger.info('Commit created:', commitResult.commitCid);
+
+      // Store the record's raw DAG-CBOR bytes as a block
+      await repo.storeBlock(recordCid.toString(), recordBytes);
       
       // Also store in RDF for compatibility - using simple RDF triples instead of JSON-LD
       const recordUri = `${this.settings.baseUri || 'https://example.com'}/atproto/${did}/${collection}/${recordKey}`;
@@ -137,13 +143,30 @@ const AtprotoService = {
         
         this.logger.info('Record stored in triplestore and repository successfully');
         
-        // Create firehose message for federation
-        const firehoseMsg = {
-          op: 'create',
-          path: `at://${did}/${collection}/${recordKey}`,
-          cid: recordCid.toString(),
-          timestamp: new Date().toISOString()
-        };
+        // Create proper atproto firehose #commit frame
+        // Format: two concatenated CBOR values — header + body
+        let firehoseMsg = null;
+        try {
+          const { dagCbor: dc } = require('../utils/atproto-utils');
+          const { CID } = await import('multiformats/cid');
+
+          const headerBytes = await dc.encode({ op: 1, t: '#commit' });
+          const bodyBytes = await dc.encode({
+            ops: [{ action: 'create', cid: CID.parse(recordCid.toString()), path: `${collection}/${recordKey}` }],
+            seq: ++this.settings.globalSeq,
+            rev: commitResult.commitCid, // use commitCid as rev for now
+            repo: did,
+            time: new Date().toISOString(),
+            blobs: [],
+            blocks: new Uint8Array(0), // minimal — relay will fetch full CAR via getRepo
+            commit: CID.parse(commitResult.commitCid),
+            rebase: false,
+            tooBig: false
+          });
+          firehoseMsg = Buffer.concat([headerBytes, bodyBytes]);
+        } catch (e) {
+          this.logger.warn('Failed to build firehose frame:', e.message);
+        }
         
         // Emit event for bridge service
         const recordData = {
